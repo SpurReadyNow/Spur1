@@ -83,7 +83,7 @@
 
     <div class="main-content" id="mainAppContainer">
         
-        <!-- PURE EDGE - No Promotional Pill needed here -->
+        <!-- PURE EDGE - Fixed $29.99 Shadow Link -->
         <div class="vip-top-pill">
             <div class="vip-pill-left"><span class="vip-star">✦</span><span data-en="SPUR Edge™ | 15-Min Refinement" data-fr="SPUR Edge™ | Raffinement 15 Min">SPUR Edge™ | 15-Min Refinement</span></div>
             <div class="vip-pill-right" data-en="Keep It Sharp" data-fr="Restez Net">Keep It Sharp</div>
@@ -111,7 +111,6 @@
         <div class="cta-container">
             <div class="inline-pricing"><span id="displayPrice">$29.99 CAD</span> <span data-en="Edge Flat Rate" data-fr="Tarif Fixe Edge">Edge Flat Rate</span></div>
             <div>
-                <!-- PURE BASIC EDGE: Ready Now Only -->
                 <button class="ready-circle-btn" onclick="openIntercept('now')"><span class="ready-line-1">READY</span><span class="ready-line-2">NOW™</span></button>
                 <div class="cta-footer-note" data-en="Perimeter line-up, neck taper & beard alignment.<br>You just show up." data-fr="Contours, nuque et alignement de la barbe.<br>Vous vous présentez, tout simplement.">Perimeter line-up, neck taper & beard alignment.<br>You just show up.</div>
             </div>
@@ -161,14 +160,11 @@
     <div id="historyModal" class="modal-overlay">
         <div class="modal-card" style="display: flex; flex-direction: column;">
             <h3 data-en="Your Bookings" data-fr="Vos Réservations">Your Bookings</h3>
-            <div id="historyContent" style="flex-grow: 1; max-height: 400px; overflow-y: auto; margin: 15px 0; text-align: left;">
-                <!-- Content injected via JS -->
-            </div>
+            <div id="historyContent" style="flex-grow: 1; max-height: 400px; overflow-y: auto; margin: 15px 0; text-align: left;"></div>
             <button class="modal-capsule-btn" onclick="closeModals()" data-en="CLOSE" data-fr="FERMER" style="margin-top: auto;">CLOSE</button>
         </div>
     </div>
 
-    <!-- SPECIALIST INTERCEPT MODAL -->
     <div id="interceptModal" class="modal-overlay">
         <div class="modal-card">
             <h3 data-en="Securing Your Chair" data-fr="Sécurisation de votre place">Securing Your Chair</h3>
@@ -239,18 +235,17 @@
         let currentCity = 'yvr';
         const SPUR_WHATSAPP_NUMBER = '14387251010';
         
-        // Decluttered Header Configurations
+        // Uncluttered Header Configurations
         const cityData = {
             yvr: { enBadge: "YVR • Yaletown • Live", frBadge: "YVR • Yaletown • En Direct", areaName: "Yaletown, Vancouver", isLive: true },
             yyz: { enBadge: "YYZ • Waitlist", frBadge: "YYZ • Liste d'attente", areaName: "Financial District, Toronto", isLive: false },
             yul: { enBadge: "YUL • Waitlist", frBadge: "YUL • Liste d'attente", areaName: "Le Plateau, Montréal", isLive: false }
         };
-
         const SUPABASE_URL = 'https://quqcgjkbvajcltwuoqvz.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_h-5S_3VCTLKsN8iVUc_LxQ_T7rn1HlJ';
         const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-        // TIMEZONE ENGINE (Checks Pacific Time 9AM - 8PM)
+        // TIMEZONE ENGINE
         function isPTHours() {
             try {
                 const now = new Date();
@@ -271,19 +266,15 @@
             safeOpenModal('historyModal');
             const historyContent = document.getElementById('historyContent');
             const lang = localStorage.getItem('spur_lang') || 'en';
-            
             let bookingsData = JSON.parse(localStorage.getItem('spur_history') || '[]');
-
             if (bookingsData.length === 0) {
                 historyContent.innerHTML = `<div style="text-align:center; color: var(--text-muted); font-size: 12px; margin-top: 20px;">${lang === 'fr' ? "Aucune réservation passée trouvée sur cet appareil." : "No past bookings found on this device."}</div>`;
                 return;
             }
-
             let html = '';
             bookingsData.forEach(req => {
                 const dateObj = new Date(req.date);
                 const formattedDate = dateObj.toLocaleDateString(lang === 'fr' ? 'fr-CA' : 'en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
-                
                 html += `
                     <div class="perks-mini-box" style="margin-bottom: 10px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
@@ -429,7 +420,7 @@
                         const header = modal.querySelector('.dynamic-header');
                         if(header) header.textContent = lang === 'fr' ? "Bon retour, " + savedName.split(' ')[0] : "Welcome back, " + savedName.split(' ')[0];
                         
-                        // TIGHTENED UX TEXT TO PREVENT ORPHANED WORDS
+                        // TIGHTENED UX TEXT
                         if(desc) desc.textContent = lang === 'fr' ? "Profil sécurisé. Confirmez pour coordonner votre match." : "Profile secured. Confirm to coordinate your match.";
                         if(submitBtn) { submitBtn.textContent = lang === 'fr' ? "CONFIRMER LA DEMANDE" : "CONFIRM REQUEST"; }
                     } else {
