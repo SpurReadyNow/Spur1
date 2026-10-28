@@ -145,6 +145,7 @@
             </div>
 
             <div>
+                <!-- PURE BASIC: Massive 170px button -->
                 <button class="ready-circle-btn" onclick="openIntercept('now')">
                     <span class="ready-line-1">READY</span>
                     <span class="ready-line-2">NOW™</span>
@@ -206,7 +207,7 @@
         </div>
     </div>
 
-    <!-- BOOKING HISTORY MODAL (Secured via Local Storage) -->
+    <!-- BOOKING HISTORY MODAL -->
     <div id="historyModal" class="modal-overlay">
         <div class="modal-card" style="display: flex; flex-direction: column;">
             <h3 data-en="Your Bookings" data-fr="Vos Réservations">Your Bookings</h3>
@@ -229,7 +230,7 @@
         </div>
     </div>
 
-    <!-- READY NOW MODAL (PURE BASIC: Name & Phone Only) -->
+    <!-- READY NOW MODAL (PURE BASIC: Zero Menus, Dynamic Return UX) -->
     <div id="verifyModal" class="modal-overlay">
         <div class="modal-card">
             <h3 class="dynamic-header" data-en="Get Ready Now" data-fr="Préparez-vous Maintenant">Get Ready Now</h3>
@@ -255,7 +256,7 @@
         </div>
     </div>
 
-    <!-- CODE MODAL (Anti-Loophole Enforced) -->
+    <!-- CODE MODAL (Anti-Loophole) -->
     <div id="codeModal" class="modal-overlay">
         <div class="modal-card">
             <h3 data-en="Enter SPURTAN Code" data-fr="Entrez le code SPURTAN">Enter SPURTAN Code</h3>
@@ -274,7 +275,7 @@
         </div>
     </div>
 
-    <!-- FOUNDING SPURTAN REGISTRATION MODAL (Anti-Loophole Enforced) -->
+    <!-- FOUNDING SPURTAN REGISTRATION MODAL (Anti-Loophole) -->
     <div id="spurtanModal" class="modal-overlay">
         <div class="modal-card">
             <h3 data-en="Founding Spurtan Access" data-fr="Accès Spurtan Fondateur">Founding Spurtan Access</h3>
@@ -479,6 +480,7 @@
             if (savedName) {
                 const sub = document.getElementById('dynamicHeroSubtitle');
                 if (sub) sub.textContent = lang === 'fr' ? "Bon retour, " + savedName.split(' ')[0] + "." : "Welcome back, " + savedName.split(' ')[0] + ".";
+                
                 document.querySelectorAll('.dynamic-header').forEach(header => {
                     if (header.textContent.includes('Welcome back') || header.textContent.includes('Bon retour')) {
                          header.textContent = lang === 'fr' ? "Bon retour, " + savedName.split(' ')[0] : "Welcome back, " + savedName.split(' ')[0];
@@ -499,21 +501,21 @@
                     const lang = localStorage.getItem('spur_lang') || 'en';
                     document.getElementById('recognizedSpecialistText').textContent = lang === 'fr' ? `Demander ${savedSpecialist} à nouveau ?` : `Request ${savedSpecialist} again?`;
                     document.getElementById('interceptModal').style.display = 'flex';
-                } else { safeOpenModal(type === 'now' ? 'verifyModal' : 'laterModal'); }
-            } catch (err) { safeOpenModal(type === 'now' ? 'verifyModal' : 'laterModal'); }
+                } else { safeOpenModal('verifyModal'); }
+            } catch (err) { safeOpenModal('verifyModal'); }
         }
 
         function confirmPreviousSpecialist() {
             const savedSpecialist = localStorage.getItem('last_specialist') || 'Priority Match';
             document.querySelectorAll('.specialistHiddenField').forEach(el => el.value = savedSpecialist);
             document.getElementById('interceptModal').style.display = 'none';
-            safeOpenModal(currentInterceptType === 'now' ? 'verifyModal' : 'laterModal');
+            safeOpenModal('verifyModal');
         }
 
         function skipIntercept() {
             document.querySelectorAll('.specialistHiddenField').forEach(el => el.value = 'Priority Match');
             document.getElementById('interceptModal').style.display = 'none';
-            safeOpenModal(currentInterceptType === 'now' ? 'verifyModal' : 'laterModal');
+            safeOpenModal('verifyModal');
         }
 
         function safeOpenModal(id) {
@@ -521,25 +523,29 @@
                 const modal = document.getElementById(id);
                 if (!modal) return;
                 
-                // Original Basic version: ignore calls to open laterModal since it doesn't exist.
-                if (id === 'laterModal') return;
-
                 if (id === 'verifyModal') {
                     const savedName = localStorage.getItem('spur_user_name');
                     const savedPhone = localStorage.getItem('spur_user_phone');
                     const contactFields = modal.querySelector('.contact-fields');
                     const resetBtn = document.getElementById('resetUserBtn');
+                    const desc = modal.querySelector('.dynamic-desc');
+                    const submitBtn = modal.querySelector('button[type="submit"]');
                     const lang = localStorage.getItem('spur_lang') || 'en';
+                    
                     if (savedName && savedPhone) {
                         if(contactFields) { contactFields.style.display = 'none'; contactFields.querySelectorAll('input').forEach(i => i.required = false); }
                         if(resetBtn) resetBtn.style.display = 'block';
                         const header = modal.querySelector('.dynamic-header');
                         if(header) header.textContent = lang === 'fr' ? "Bon retour, " + savedName.split(' ')[0] : "Welcome back, " + savedName.split(' ')[0];
+                        if(desc) desc.textContent = lang === 'fr' ? "Votre profil est sécurisé. Confirmez ci-dessous pour coordonner votre match." : "Your profile is secured. Confirm below to coordinate your match.";
+                        if(submitBtn) submitBtn.textContent = lang === 'fr' ? "CONFIRMER LA DEMANDE" : "CONFIRM REQUEST";
                     } else {
                         if(contactFields) { contactFields.style.display = 'block'; contactFields.querySelectorAll('input').forEach(i => i.required = true); }
                         if(resetBtn) resetBtn.style.display = 'none';
                         const header = modal.querySelector('.dynamic-header');
                         if(header) header.textContent = lang === 'fr' ? "Préparez-vous Maintenant" : "Get Ready Now";
+                        if(desc) desc.textContent = lang === 'fr' ? "Entrez vos coordonnées. Nous coordonnerons votre match." : "Enter your details. We will coordinate your match.";
+                        if(submitBtn) submitBtn.textContent = lang === 'fr' ? "ENVOYER LA DEMANDE" : "SEND REQUEST";
                     }
                 }
                 modal.style.display = 'flex';
@@ -551,12 +557,15 @@
             localStorage.removeItem('spur_user_phone'); 
             localStorage.removeItem('last_specialist');
             localStorage.removeItem('spur_applied_code'); 
+            localStorage.removeItem('spur_history'); // SECURITY: Wipe dashboard memory on reset
             
             // SECURITY: Deliberately skipping spur_discount_used to prevent loophole.
+            
             const priceDisplay = document.getElementById('displayPrice');
             if(priceDisplay) priceDisplay.textContent = "$49.99 CAD";
-            alert("Profile reset. Please enter your details.");
-            closeModals(); safeOpenModal('verifyModal');
+            
+            // Re-render modal immediately
+            safeOpenModal('verifyModal');
         }
 
         function closeModals() { document.querySelectorAll('.modal-overlay').forEach(el => el.style.display = 'none'); }
@@ -654,7 +663,7 @@
             const city = form.querySelector('.formCityField').value;
             const specialist = form.querySelector('input[name="requested_specialist"]')?.value || 'Priority Match';
             
-            // Hardcoded parameters for the Original Basic Version
+            // Original Basic: Hardcoded parameters
             const occasion = "Standard Refresh";
             let finalPrice = 49.99;
             let serviceRequested = "SPUR Refresh";
