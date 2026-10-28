@@ -22,10 +22,10 @@
         .header-container { width: 100%; max-width: 440px; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 35px; }
         .top-right-group { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
         
-        /* CSS LOCK FOR BADGE */
+        /* FIXED UNCLUTTERED BADGE */
         .live-badge { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 5px 10px; border-radius: 20px; font-size: 9px; font-weight: 600; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; }
-        
         .live-dot { width: 5px; height: 5px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 6px #2ecc71; transition: all 0.3s ease; }
+        
         .controls-row { display: flex; gap: 8px; }
         .toggle-capsule { display: flex; align-items: center; background: rgba(255, 255, 255, 0.03); padding: 4px 8px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.06); }
         .toggle-capsule button { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 10px; font-weight: 600; padding: 2px 3px; transition: color 0.2s ease; }
@@ -62,7 +62,6 @@
         .modal-close { background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; margin-top: 15px; display: inline-block; }
         .reset-user-link { display: none; background: none; border: none; color: var(--gold); font-size: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; text-decoration: underline; margin: 15px auto 5px auto; width: 100%; }
         .perks-mini-box { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; margin-bottom: 16px; text-align: left; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
-        .perks-mini-box strong { color: var(--text-main); font-weight: 600; }
         .detailed-steps { text-align: left; margin: 24px 0; }
         .detailed-step-row { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
         .detailed-step-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -90,7 +89,6 @@
 </head>
 <body>
 
-    <!-- MAIN APP SCREEN -->
     <div class="main-content" id="mainAppContainer">
         
         <div class="vip-top-pill" onclick="safeOpenModal('spurtanModal')">
@@ -171,7 +169,7 @@
         </div>
     </div>
 
-    <!-- HOW IT WORKS MODAL (The 6-Step Manifesto) -->
+    <!-- HOW IT WORKS MODAL (The Manifesto) -->
     <div id="howItWorksModal" class="modal-overlay">
         <div class="modal-card">
             <h3 data-en="The SPUR Standard" data-fr="Le Standard SPUR">The SPUR Standard</h3>
@@ -213,14 +211,11 @@
     <div id="historyModal" class="modal-overlay">
         <div class="modal-card" style="display: flex; flex-direction: column;">
             <h3 data-en="Your Bookings" data-fr="Vos Réservations">Your Bookings</h3>
-            <div id="historyContent" style="flex-grow: 1; max-height: 400px; overflow-y: auto; margin: 15px 0; text-align: left;">
-                <!-- Content injected via JS -->
-            </div>
+            <div id="historyContent" style="flex-grow: 1; max-height: 400px; overflow-y: auto; margin: 15px 0; text-align: left;"></div>
             <button class="modal-capsule-btn" onclick="closeModals()" data-en="CLOSE" data-fr="FERMER" style="margin-top: auto;">CLOSE</button>
         </div>
     </div>
 
-    <!-- SPECIALIST INTERCEPT MODAL -->
     <div id="interceptModal" class="modal-overlay">
         <div class="modal-card">
             <h3 data-en="Securing Your Chair" data-fr="Sécurisation de votre place">Securing Your Chair</h3>
@@ -232,7 +227,7 @@
         </div>
     </div>
 
-    <!-- READY NOW MODAL (PURE BASIC: Name & Phone Only, Dynamic UX) -->
+    <!-- READY NOW MODAL (PURE BASIC - ZERO MENU, DYNAMIC UX) -->
     <div id="verifyModal" class="modal-overlay">
         <div class="modal-card">
             <h3 class="dynamic-header" data-en="Get Ready Now" data-fr="Préparez-vous Maintenant">Get Ready Now</h3>
@@ -292,7 +287,7 @@
             <form action="https://formspree.io/f/mjykllwj" method="POST" onsubmit="handleSpurtanRegister(event)">
                 <input type="text" name="_gotcha" style="display:none">
                 <input type="text" class="modal-input" name="client_name" required placeholder="First Name" data-en-placeholder="First Name" data-fr-placeholder="Prénom">
-                <input type="tel" class="modal-input" name="client_phone" id="spurtanPhoneInput" required placeholder="10 Digit Mobile" data-en-placeholder="10 Digit Mobile" data-fr-placeholder="Mobile à 10 chiffres" pattern="[0-9]{10}">
+                <input type="tel" class="modal-input" name="client_phone" required placeholder="10 Digit Mobile" data-en-placeholder="10 Digit Mobile" data-fr-placeholder="Mobile à 10 chiffres" pattern="[0-9]{10}">
                 <select class="modal-input" name="launch_node" id="spurtanNodeSelect" required>
                     <option value="Yaletown, Vancouver">Yaletown, Vancouver (Live)</option>
                     <option value="Le Plateau, Montreal">Montreal (Waitlist)</option>
@@ -335,7 +330,6 @@
         let currentCity = 'yvr';
         const SPUR_WHATSAPP_NUMBER = '14387251010';
         
-        // Decluttered Header Configurations
         const cityData = {
             yvr: { enBadge: "YVR • Yaletown • Live", frBadge: "YVR • Yaletown • En Direct", areaName: "Yaletown, Vancouver", isLive: true },
             yyz: { enBadge: "YYZ • Waitlist", frBadge: "YYZ • Liste d'attente", areaName: "Financial District, Toronto", isLive: false },
@@ -346,15 +340,15 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_h-5S_3VCTLKsN8iVUc_LxQ_T7rn1HlJ';
         const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-        // Timezone Engine (Checks Pacific Time)
+        // TIMEZONE ENGINE (Checks Pacific Time 9AM - 8PM)
         function isPTHours() {
             try {
                 const now = new Date();
                 const ptString = now.toLocaleString("en-US", {timeZone: "America/Los_Angeles"});
                 const ptTime = new Date(ptString);
                 const hours = ptTime.getHours();
-                return hours >= 9 && hours < 20; // 9:00 AM to 7:59 PM
-            } catch(e) { return true; } // Fallback to live if browser doesn't support timezone parsing
+                return hours >= 9 && hours < 20; 
+            } catch(e) { return true; } 
         }
 
         function returnToHome() {
@@ -515,7 +509,7 @@
         function openIntercept(type) {
             const lang = localStorage.getItem('spur_lang') || 'en';
             
-            // Timezone block for Live Yaletown
+            // TIMEZONE BLOCKER
             if (type === 'now' && currentCity === 'yvr' && !isPTHours()) {
                 alert(lang === 'fr' ? "Le concierge est actuellement hors ligne. Veuillez revenir demain pour réserver votre place." : "The concierge is currently offline. Please check back tomorrow to secure a chair.");
                 return;
@@ -564,14 +558,19 @@
                         if(resetBtn) resetBtn.style.display = 'block';
                         const header = modal.querySelector('.dynamic-header');
                         if(header) header.textContent = lang === 'fr' ? "Bon retour, " + savedName.split(' ')[0] : "Welcome back, " + savedName.split(' ')[0];
-                        if(desc) desc.textContent = lang === 'fr' ? "Votre profil est sécurisé. Confirmez ci-dessous pour coordonner votre match." : "Your profile is secured. Confirm below to coordinate your match.";
+                        
+                        // FIX: TIGHTENED UX TEXT TO PREVENT ORPHANED WORDS
+                        if(desc) desc.textContent = lang === 'fr' ? "Profil sécurisé. Confirmez pour coordonner votre match." : "Profile secured. Confirm to coordinate your match.";
+                        
                         if(submitBtn) { submitBtn.textContent = lang === 'fr' ? "CONFIRMER LA DEMANDE" : "CONFIRM REQUEST"; }
                     } else {
                         if(contactFields) { contactFields.style.display = 'block'; contactFields.querySelectorAll('input').forEach(i => i.required = true); }
                         if(resetBtn) resetBtn.style.display = 'none';
                         const header = modal.querySelector('.dynamic-header');
                         if(header) header.textContent = lang === 'fr' ? "Préparez-vous Maintenant" : "Get Ready Now";
+                        
                         if(desc) desc.textContent = lang === 'fr' ? "Entrez vos coordonnées. Nous coordonnerons votre match." : "Enter your details. We will coordinate your match.";
+                        
                         if(submitBtn) { submitBtn.textContent = lang === 'fr' ? "ENVOYER LA DEMANDE" : "SEND REQUEST"; }
                     }
                 }
@@ -699,7 +698,7 @@
 
             const city = form.querySelector('.formCityField').value;
             const specialist = form.querySelector('input[name="requested_specialist"]')?.value || 'Priority Match';
-            const occasion = "Standard Refresh";
+            const occasion = "Standard Refresh"; // Basic configuration
             let finalPrice = 49.99;
             let serviceRequested = "SPUR Refresh";
             let hasCode = localStorage.getItem('spur_applied_code') !== null;
@@ -723,7 +722,6 @@
             localHistory.unshift(newBooking);
             localStorage.setItem('spur_history', JSON.stringify(localHistory.slice(0, 5)));
 
-            // Execute Network Call & Fake Delay for Luxury Feel
             await syncClientToSupabase(name, phone, specialist);
             try {
                 if (supabaseClient) await supabaseClient.from('requests').insert({ phone, city, type, specialist, occasion, service: serviceRequested, price: finalPrice });
