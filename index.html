@@ -63,8 +63,6 @@ body{background-color:var(--bg-color);color:var(--text-main);min-height:100vh;di
 .ready-line-1{font-size:19px;font-weight:800;letter-spacing:2px;line-height:1.1}
 .ready-line-2{font-size:18px;font-weight:800;letter-spacing:1.5px;line-height:1.1}
 
-.ready-later-btn{background:transparent;border:1px solid var(--border-color);color:var(--gold);padding:12px 24px;border-radius:30px;font-size:11px;font-weight:600;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;transition:all .2s ease;display:flex;align-items:center;gap:8px}
-.ready-later-btn:hover{border-color:var(--gold)}
 .cta-footer-note{font-size:12px;color:var(--text-muted);letter-spacing:.5px;text-align:center;margin-top:5px;max-width:320px;line-height:1.4}
 .active-hours-note{font-size:10px;color:#555;letter-spacing:1px;text-transform:uppercase;text-align:center;margin-top:10px}
 
@@ -138,7 +136,7 @@ select.modal-input option{background:#141414;color:#fff}
         <div class="inline-pricing">$49.99 CAD <span data-en="Refresh" data-fr="Rafraîchissement">Refresh</span> | <span>$69.99 CAD</span> <span data-en="Reset" data-fr="Réinitialisation">Reset</span></div>
         
         <div>
-            <!-- NEW PREMIUM 3D BUTTON -->
+            <!-- PREMIUM 3D BUTTON (READY NOW ONLY) -->
             <button class="ready-circle-btn" onclick="openIntercept('now')">
                 <span class="ready-line-1">READY</span>
                 <span class="ready-line-2">NOW™</span>
@@ -146,10 +144,6 @@ select.modal-input option{background:#141414;color:#fff}
             <div class="cta-footer-note" data-en="Immediate dispatch. Ultimate precision.<br>Zero menus. Zero friction." data-fr="Envoi immédiat. Précision ultime.<br>Zéro menu. Zéro friction.">Immediate dispatch. Ultimate precision.<br>Zero menus. Zero friction.</div>
         </div>
         
-        <button class="ready-later-btn" onclick="openIntercept('later')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            <span>READY LATER™</span>
-        </button>
         <div class="active-hours-note" data-en="Active Concierge Hours: 9:00 AM – 8:00 PM (PT)" data-fr="Heures de conciergerie : 9h00 – 20h00 (HP)">Active Concierge Hours: 9:00 AM – 8:00 PM (PT)</div>
     </div>
     
@@ -187,28 +181,6 @@ select.modal-input option{background:#141414;color:#fff}
                 <option value="Reset ($69.99)">Reset - Full Restyle ($69.99)</option>
             </select>
             <button type="submit" class="modal-capsule-btn" data-en="SEND REQUEST" data-fr="ENVOYER LA DEMANDE">SEND REQUEST</button>
-        </form>
-        <button class="modal-close" onclick="closeModals()" data-en="CANCEL" data-fr="ANNULER">CANCEL</button>
-    </div>
-</div>
-
-<!-- Ready Later Modal -->
-<div id="laterModal" class="modal-overlay">
-    <div class="modal-card">
-        <h3 data-en="Plan Ahead" data-fr="Planifier à L'avance">Plan Ahead</h3>
-        <p data-en="Commit to a scheduled visit. We'll coordinate availability." data-fr="Engagez-vous pour une visite planifiée.">Commit to a scheduled visit. We'll coordinate availability.</p>
-        <form action="https://formspree.io/f/mjykllwj" method="POST" onsubmit="handleSubmit(event, 'later')">
-            <input type="text" name="_gotcha" style="display:none">
-            <input type="hidden" name="requested_specialist" id="specialistHiddenFieldLater" value="Priority Match">
-            <input type="text" class="modal-input" name="client_name" id="nameInputLater" placeholder="First Name" required>
-            <input type="tel" class="modal-input" name="client_phone" id="phoneInputLater" placeholder="10 Digit Mobile" pattern="[0-9]{10}" required>
-            <input type="date" class="modal-input" name="requested_date" required>
-            <select class="modal-input" name="requested_time" required>
-                <option value="Morning (9AM - 12PM)">Morning (9AM - 12PM)</option>
-                <option value="Afternoon (12PM - 4PM)">Afternoon (12PM - 4PM)</option>
-                <option value="Evening (4PM - 8PM)">Evening (4PM - 8PM)</option>
-            </select>
-            <button type="submit" class="modal-capsule-btn" data-en="SUBMIT REQUEST" data-fr="SOUMETTRE LA DEMANDE">SUBMIT REQUEST</button>
         </form>
         <button class="modal-close" onclick="closeModals()" data-en="CANCEL" data-fr="ANNULER">CANCEL</button>
     </div>
@@ -252,7 +224,6 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 let returningUser = null;
 let currentLanguage = 'en';
-let activeFlow = 'now';
 
 function switchLanguage(lang) {
     currentLanguage = lang;
@@ -261,7 +232,6 @@ function switchLanguage(lang) {
         el.innerHTML = lang === 'fr' ? el.getAttribute('data-fr') : el.getAttribute('data-en');
     });
     document.getElementById('nameInputNow').placeholder = lang === 'fr' ? 'Prénom' : 'First Name';
-    document.getElementById('nameInputLater').placeholder = lang === 'fr' ? 'Prénom' : 'First Name';
     document.getElementById('btn-en').className = lang === 'en' ? 'active' : '';
     document.getElementById('btn-fr').className = lang === 'fr' ? 'active' : '';
     updateLiveCounter();
@@ -288,22 +258,23 @@ async function checkReturningUserRealtime() {
             returningUser = data;
             document.getElementById('nameInputNow').value = data.name;
             document.getElementById('phoneInputNow').value = data.phone;
-            if(document.getElementById('nameInputLater')) document.getElementById('nameInputLater').value = data.name;
-            if(document.getElementById('phoneInputLater')) document.getElementById('phoneInputLater').value = data.phone;
         }
     }
 }
 
-function openIntercept(type) {
-    activeFlow = type;
+function checkBusinessHours() {
     const now = new Date();
     const ptTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
     const hour = ptTime.getHours();
-    
-    // Offline checking logic
-    if (type === 'now' && (hour < 9 || hour >= 20)) {
-        activeFlow = 'later';
+    if (hour < 9 || hour >= 20) {
+        alert(currentLanguage === 'fr' ? "Le concierge est actuellement hors ligne. Veuillez revenir demain pour réserver votre place." : "The concierge is currently offline. Please check back tomorrow to secure a chair.");
+        return false;
     }
+    return true;
+}
+
+function openIntercept(type) {
+    if (!checkBusinessHours()) return;
 
     if (returningUser && returningUser.last_specialist && returningUser.last_specialist !== "Priority Match") {
         document.getElementById('recognizedSpecialistText').textContent = `Request ${returningUser.last_specialist} again?`;
@@ -315,16 +286,14 @@ function openIntercept(type) {
 
 function confirmPreviousSpecialist() {
     document.getElementById('specialistHiddenFieldNow').value = returningUser.last_specialist;
-    if(document.getElementById('specialistHiddenFieldLater')) document.getElementById('specialistHiddenFieldLater').value = returningUser.last_specialist;
     closeModals();
-    document.getElementById(activeFlow === 'now' ? 'verifyModal' : 'laterModal').style.display = 'flex';
+    document.getElementById('verifyModal').style.display = 'flex';
 }
 
 function skipIntercept() {
     document.getElementById('specialistHiddenFieldNow').value = "Priority Match";
-    if(document.getElementById('specialistHiddenFieldLater')) document.getElementById('specialistHiddenFieldLater').value = "Priority Match";
     closeModals();
-    document.getElementById(activeFlow === 'now' ? 'verifyModal' : 'laterModal').style.display = 'flex';
+    document.getElementById('verifyModal').style.display = 'flex';
 }
 
 function closeModals() {
@@ -363,7 +332,7 @@ async function handleSubmit(e, type) {
         await supabaseClient.from('requests').insert([{
             phone: clientPhone,
             city: 'Vancouver',
-            type: type,
+            type: 'now',
             specialist: requestedSpec
         }]);
     } catch (err) {}
@@ -382,7 +351,7 @@ async function handleSubmit(e, type) {
     document.getElementById('mainAppContainer').style.display = 'none';
     document.getElementById('finalSuccessView').style.display = 'block';
     
-    const waMsg = encodeURIComponent(`SPUR PRIORITY SECURED\nName: ${clientName}\nPhone: ${clientPhone}\nRequest: ${type === 'now' ? 'Ready Now' : 'Ready Later'}`);
+    const waMsg = encodeURIComponent(`SPUR PRIORITY SECURED\nName: ${clientName}\nPhone: ${clientPhone}\nRequest: Ready Now`);
     document.getElementById('whatsappBtn').href = `https://wa.me/17789175404?text=${waMsg}`;
 }
 
