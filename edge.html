@@ -11,7 +11,6 @@
 <body>
 <div class="main-content" id="mainAppContainer">
     
-    <!-- PURE EDGE - No Promotional Pill needed here -->
     <div class="vip-top-pill">
         <div class="vip-pill-left"><span class="vip-star">✦</span><span data-en="SPUR Edge™ | 15-Min Refinement" data-fr="SPUR Edge™ | Raffinement 15 Min">SPUR Edge™ | 15-Min Refinement</span></div>
         <div class="vip-pill-right" data-en="Keep It Sharp" data-fr="Restez Net">Keep It Sharp</div>
@@ -25,7 +24,7 @@
         <div class="top-right-group">
             <div class="live-badge"><div class="live-dot" id="liveDotIndicator"></div><span id="liveBadgeText">YVR • Yaletown • Live</span></div>
             <div class="controls-row">
-                <div class="toggle-capsule"><button onclick="setCity('yvr')" id="btn-yvr" class="active">YVR</button><span>|</span><button onclick="alertCity('yyz')" id="btn-yyz" style="opacity: 0.5;">YYZ</button><span>|</span><button onclick="setCity('yul')" id="btn-yul">YUL</button></div>
+                <div class="toggle-capsule"><button onclick="setCity('yvr')" id="btn-yvr" class="active">YVR</button><span>|</span><button onclick="setCity('yyz')" id="btn-yyz" style="opacity: 0.5;">YYZ</button><span>|</span><button onclick="setCity('yul')" id="btn-yul">YUL</button></div>
                 <div class="toggle-capsule"><button onclick="switchLanguage('en')" id="btn-en" class="active">EN</button><span>|</span><button onclick="switchLanguage('fr')" id="btn-fr">FR</button></div>
             </div>
         </div>
@@ -156,7 +155,6 @@ function isPTHours(){try{const now=new Date();const ptString=now.toLocaleString(
 function returnToHome(){document.getElementById('finalSuccessView').style.display='none';document.getElementById('mainAppContainer').style.display='flex';window.scrollTo({top:0,behavior:'smooth'});}
 
 async function openHistoryModal(){safeOpenModal('historyModal');const historyContent=document.getElementById('historyContent');const lang=localStorage.getItem('spur_lang')||'en';let bookingsData=JSON.parse(localStorage.getItem('spur_history')||'[]');if(bookingsData.length===0){historyContent.innerHTML=`<div style="text-align:center; color: var(--text-muted); font-size: 12px; margin-top: 20px;">${lang==='fr'?"Aucune réservation passée trouvée sur cet appareil.":"No past bookings found on this device."}</div>`;return;}let html='';bookingsData.forEach(req=>{const dateObj=new Date(req.date);const formattedDate=dateObj.toLocaleDateString(lang==='fr'?'fr-CA':'en-CA',{month:'short',day:'numeric',year:'numeric'});html+=`<div class="perks-mini-box" style="margin-bottom: 10px;"><div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><strong style="color: var(--gold); font-size: 11px;">${formattedDate}</strong><span style="font-size: 10px; color: #2ecc71; font-weight: 700;">${(req.type||'now').toUpperCase()}</span></div><div style="font-size: 12px; color: var(--text-main); margin-bottom: 4px;">${req.service}</div><div style="font-size: 10px; color: var(--text-muted);">📍 ${req.city}</div></div>`;});historyContent.innerHTML=html;}
-
 async function checkReturningUserRealtime(){try{if(!supabaseClient)return;const savedPhone=localStorage.getItem('spur_user_phone');if(!savedPhone)return;const{data}=await supabaseClient.from('clients').select('name, last_specialist').eq('phone',savedPhone).single();if(data){if(data.name)localStorage.setItem('spur_user_name',data.name);if(data.last_specialist)localStorage.setItem('last_specialist',data.last_specialist);}}catch(err){}}
 async function syncClientToSupabase(name,phone,specialist){try{if(!supabaseClient)return;const payload={phone:phone,name:name,last_specialist:specialist};await supabaseClient.from('clients').upsert(payload,{onConflict:'phone'});}catch(err){}}
 
@@ -167,10 +165,9 @@ function switchLanguage(lang){document.getElementById('btn-en').classList.toggle
 
 let currentInterceptType='now';
 function openIntercept(type){const lang=localStorage.getItem('spur_lang')||'en';
-    // TIMEZONE BLOCKER (Edge Variation 1 has NO Ready Later button, so we tell them to check back tomorrow)
-    if(type==='now'&&currentCity==='yvr'&&!isPTHours()){alert(lang==='fr'?"Le concierge est actuellement hors ligne. Veuillez revenir demain pour réserver votre place.":"The concierge is currently offline. Please check back tomorrow to secure a chair.");return;}
-    try{currentInterceptType=type;const savedSpecialist=localStorage.getItem('last_specialist');const savedName=localStorage.getItem('spur_user_name');if(savedName&&savedSpecialist&&savedSpecialist!=='Priority Match'&&savedSpecialist!=='undefined'){document.getElementById('recognizedSpecialistText').textContent=lang==='fr'?`Demander ${savedSpecialist} à nouveau ?`:`Request ${savedSpecialist} again?`;document.getElementById('interceptModal').style.display='flex';}else{safeOpenModal('verifyModal');}}catch(err){safeOpenModal('verifyModal');}
-}
+if(currentCity==='yul'||currentCity==='yyz'){alert(lang==='fr'?"Cette ville est actuellement sur liste d'attente. L'accès Fondateur est géré sur le site principal.":"This city is currently waitlisted. Founding Spurtan access is managed on the main site.");return;}
+if(type==='now'&&currentCity==='yvr'&&!isPTHours()){alert(lang==='fr'?"Le concierge est actuellement hors ligne. Veuillez revenir demain pour réserver votre place.":"The concierge is currently offline. Please check back tomorrow to secure a chair.");return;}
+try{currentInterceptType=type;const savedSpecialist=localStorage.getItem('last_specialist');const savedName=localStorage.getItem('spur_user_name');if(savedName&&savedSpecialist&&savedSpecialist!=='Priority Match'&&savedSpecialist!=='undefined'){document.getElementById('recognizedSpecialistText').textContent=lang==='fr'?`Demander ${savedSpecialist} à nouveau ?`:`Request ${savedSpecialist} again?`;document.getElementById('interceptModal').style.display='flex';}else{safeOpenModal('verifyModal');}}catch(err){safeOpenModal('verifyModal');}}
 function confirmPreviousSpecialist(){const savedSpecialist=localStorage.getItem('last_specialist')||'Priority Match';document.querySelectorAll('.specialistHiddenField').forEach(el=>el.value=savedSpecialist);document.getElementById('interceptModal').style.display='none';safeOpenModal('verifyModal');}
 function skipIntercept(){document.querySelectorAll('.specialistHiddenField').forEach(el=>el.value='Priority Match');document.getElementById('interceptModal').style.display='none';safeOpenModal('verifyModal');}
 
