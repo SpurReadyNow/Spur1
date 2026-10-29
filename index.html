@@ -23,7 +23,8 @@
         <div class="top-right-group">
             <div class="live-badge"><div class="live-dot" id="liveDotIndicator"></div><span id="liveBadgeText">YVR • Yaletown • Live</span></div>
             <div class="controls-row">
-                <div class="toggle-capsule"><button onclick="setCity('yvr')" id="btn-yvr" class="active">YVR</button><span>|</span><button onclick="alertCity('yyz')" id="btn-yyz" style="opacity: 0.5;">YYZ</button><span>|</span><button onclick="setCity('yul')" id="btn-yul">YUL</button></div>
+                <!-- NOW BOTH YYZ AND YUL SET CITY THE SAME WAY -->
+                <div class="toggle-capsule"><button onclick="setCity('yvr')" id="btn-yvr" class="active">YVR</button><span>|</span><button onclick="setCity('yyz')" id="btn-yyz" style="opacity: 0.5;">YYZ</button><span>|</span><button onclick="setCity('yul')" id="btn-yul">YUL</button></div>
                 <div class="toggle-capsule"><button onclick="switchLanguage('en')" id="btn-en" class="active">EN</button><span>|</span><button onclick="switchLanguage('fr')" id="btn-fr">FR</button></div>
             </div>
         </div>
@@ -34,13 +35,10 @@
     </div>
     <div class="cta-container">
         <div class="inline-pricing"><span id="displayPrice">$49.99 CAD</span> <span data-en="Priority Flat Rate" data-fr="Tarif Fixe Prioritaire">Priority Flat Rate</span><br><button type="button" onclick="safeOpenModal('codeModal')" style="background:none; border:none; color:var(--text-muted); font-size:10px; font-weight:700; text-decoration:underline; cursor:pointer; margin-top:8px;" data-en="HAVE SPURTAN CODE?" data-fr="AVEZ-UN CODE SPURTAN ?">HAVE SPURTAN CODE?</button></div>
-        
-        <!-- PURE BASIC: ONLY READY NOW BUTTON -->
         <div>
             <button class="ready-circle-btn" onclick="openIntercept('now')"><span class="ready-line-1">READY</span><span class="ready-line-2">NOW™</span></button>
             <div class="cta-footer-note" data-en="A SPUR Specialist assesses what you need.<br>You just show up." data-fr="Un spécialiste SPUR évalue ce dont vous avez besoin.<br>Vous vous présentez, tout simplement.">A SPUR Specialist assesses what you need.<br>You just show up.</div>
         </div>
-
         <div class="active-hours-note" data-en="Active Concierge Hours: 9:00 AM – 8:00 PM (PT)" data-fr="Heures de conciergerie : 9h00 – 20h00 (HP)">Active Concierge Hours: 9:00 AM – 8:00 PM (PT)</div>
     </div>
     <div class="site-footer">
@@ -91,7 +89,6 @@
         <a href="#" id="whatsappAutoBtn" class="receipt-action-btn" target="_blank"><span data-en="💬 CONFIRM VIA WHATSAPP (READY)" data-fr="💬 CONFIRMER VIA WHATSAPP (PRÊT)">💬 CONFIRM VIA WHATSAPP (READY)</span></a>
         <button onclick="returnToHome()" class="modal-capsule-btn-secondary" style="margin-top: 15px; border-color: transparent;" data-en="← BACK TO HOME" data-fr="← RETOUR À L'ACCUEIL">← BACK TO HOME</button>
         
-        <!-- CLICKABLE LUXURY CANCEL LINK -->
         <div style="margin-top: 15px; font-size: 11px; color: var(--text-muted);">
             <span data-en="Change of plans?" data-fr="Changement de programme ?">Change of plans?</span> 
             <a href="https://wa.me/14387251010?text=Hello%20SPUR%20%E2%80%94%20I%20need%20to%20modify%20my%20recent%20request." target="_blank" style="color: var(--text-main); text-decoration: underline; font-weight: 600;">
@@ -117,14 +114,25 @@ async function updateLiveCounter(){if(!supabaseClient)return;try{const{count,err
 async function checkReturningUserRealtime(){try{if(!supabaseClient)return;const savedPhone=localStorage.getItem('spur_user_phone');if(!savedPhone)return;const{data}=await supabaseClient.from('clients').select('name, last_specialist, spurtan_code').eq('phone',savedPhone).single();if(data){if(data.name)localStorage.setItem('spur_user_name',data.name);if(data.last_specialist)localStorage.setItem('last_specialist',data.last_specialist);let hasPastVisits=false;try{const{count}=await supabaseClient.from('requests').select('*',{count:'exact',head:true}).eq('phone',savedPhone);hasPastVisits=count&&count>0;}catch(e){}const localDiscountUsed=localStorage.getItem('spur_discount_used')==='true';if(data.spurtan_code&&!hasPastVisits&&!localDiscountUsed){localStorage.setItem('spur_applied_code',data.spurtan_code);const priceDisplay=document.getElementById('displayPrice');if(priceDisplay)priceDisplay.textContent="$39.99 CAD";}else{localStorage.removeItem('spur_applied_code');localStorage.setItem('spur_discount_used','true');const priceDisplay=document.getElementById('displayPrice');if(priceDisplay)priceDisplay.textContent="$49.99 CAD";}}}catch(err){}}
 
 async function syncClientToSupabase(name,phone,specialist){try{if(!supabaseClient)return;const appliedCode=localStorage.getItem('spur_applied_code')||null;const payload={phone:phone,name:name,last_specialist:specialist};if(appliedCode)payload.spurtan_code=appliedCode;await supabaseClient.from('clients').upsert(payload,{onConflict:'phone'});}catch(err){}}
-function alertCity(cityCode){if(cityCode==='yyz'){const nodeSelect=document.getElementById('spurtanNodeSelect');if(nodeSelect)nodeSelect.value="Financial District, Toronto";safeOpenModal('spurtanModal');}}
 function switchModal(closeId,openId){document.getElementById(closeId).style.display='none';safeOpenModal(openId);}
 function setCity(city){if(city!=='yvr'&&city!=='yul'&&city!=='yyz')return;currentCity=city;document.getElementById('btn-yvr').classList.toggle('active',city==='yvr');document.getElementById('btn-yyz').classList.toggle('active',city==='yyz');document.getElementById('btn-yul').classList.toggle('active',city==='yul');document.querySelectorAll('.formCityField').forEach(el=>el.value=cityData[city].areaName);document.getElementById('receiptTargetArea').innerText=cityData[city].areaName;updateBadgeText();localStorage.setItem('spur_active_city',city);}
 function updateBadgeText(){const lang=localStorage.getItem('spur_lang')||'en';const liveDot=document.getElementById('liveDotIndicator');const badgeText=document.getElementById('liveBadgeText');if(currentCity==='yvr'){if(isPTHours()){liveDot.style.backgroundColor="#2ecc71";liveDot.style.boxShadow="0 0 6px #2ecc71";badgeText.innerText=cityData['yvr'][lang==='fr'?'frBadge':'enBadge'];}else{liveDot.style.backgroundColor="#7f8c8d";liveDot.style.boxShadow="none";badgeText.innerText=lang==='fr'?"YVR • YALETOWN • HORS LIGNE":"YVR • YALETOWN • OFFLINE";}}else{liveDot.style.backgroundColor="#f39c12";liveDot.style.boxShadow="0 0 6px #f39c12";badgeText.innerText=cityData[currentCity][lang==='fr'?'frBadge':'enBadge'];}}
 function switchLanguage(lang){document.getElementById('btn-en').classList.toggle('active',lang==='en');document.getElementById('btn-fr').classList.toggle('active',lang==='fr');document.querySelectorAll('[data-en]').forEach(el=>{if(el.hasAttribute('data-fr')){el.innerHTML=lang==='fr'?el.getAttribute('data-fr'):el.getAttribute('data-en');}});document.querySelectorAll('[data-en-placeholder]').forEach(el=>{if(lang==='fr'&&el.hasAttribute('data-fr-placeholder')){el.placeholder=el.getAttribute('data-fr-placeholder');}else if(lang==='en'&&el.hasAttribute('data-en-placeholder')){el.placeholder=el.getAttribute('data-en-placeholder');}});const savedName=localStorage.getItem('spur_user_name');if(savedName){const sub=document.getElementById('dynamicHeroSubtitle');if(sub)sub.textContent=lang==='fr'?"Bon retour, "+savedName.split(' ')[0]+".":"Welcome back, "+savedName.split(' ')[0]+".";document.querySelectorAll('.dynamic-header').forEach(header=>{if(header.textContent.includes('Welcome back')||header.textContent.includes('Bon retour')){header.textContent=lang==='fr'?"Bon retour, "+savedName.split(' ')[0]:"Welcome back, "+savedName.split(' ')[0];}});}localStorage.setItem('spur_lang',lang);updateBadgeText();updateLiveCounter();}
 
 let currentInterceptType='now';
-function openIntercept(type){const lang=localStorage.getItem('spur_lang')||'en';if(type==='now'&&currentCity==='yvr'&&!isPTHours()){alert(lang==='fr'?"Le concierge est actuellement hors ligne. Veuillez revenir demain pour réserver votre place.":"The concierge is currently offline. Please check back tomorrow to secure a chair.");return;}try{currentInterceptType=type;const savedSpecialist=localStorage.getItem('last_specialist');const savedName=localStorage.getItem('spur_user_name');if(savedName&&savedSpecialist&&savedSpecialist!=='Priority Match'&&savedSpecialist!=='undefined'){document.getElementById('recognizedSpecialistText').textContent=lang==='fr'?`Demander ${savedSpecialist} à nouveau ?`:`Request ${savedSpecialist} again?`;document.getElementById('interceptModal').style.display='flex';}else{safeOpenModal('verifyModal');}}catch(err){safeOpenModal('verifyModal');}}
+function openIntercept(type){const lang=localStorage.getItem('spur_lang')||'en';
+    // WAITLIST BLOCKER
+    if (currentCity === 'yul' || currentCity === 'yyz') {
+        alert(lang === 'fr' ? "Cette ville est actuellement sur liste d'attente. Veuillez rejoindre la liste d'accès Fondateur." : "This city is currently waitlisted. Please join the Founding Spurtan access list.");
+        const nodeSelect = document.getElementById('spurtanNodeSelect');
+        if (nodeSelect) nodeSelect.value = currentCity === 'yul' ? "Le Plateau, Montreal" : "Financial District, Toronto";
+        safeOpenModal('spurtanModal');
+        return;
+    }
+    // TIMEZONE BLOCKER
+    if(type==='now'&&currentCity==='yvr'&&!isPTHours()){alert(lang==='fr'?"Le concierge est actuellement hors ligne. Veuillez revenir demain pour réserver votre place.":"The concierge is currently offline. Please check back tomorrow to secure a chair.");return;}
+    try{currentInterceptType=type;const savedSpecialist=localStorage.getItem('last_specialist');const savedName=localStorage.getItem('spur_user_name');if(savedName&&savedSpecialist&&savedSpecialist!=='Priority Match'&&savedSpecialist!=='undefined'){document.getElementById('recognizedSpecialistText').textContent=lang==='fr'?`Demander ${savedSpecialist} à nouveau ?`:`Request ${savedSpecialist} again?`;document.getElementById('interceptModal').style.display='flex';}else{safeOpenModal('verifyModal');}}catch(err){safeOpenModal('verifyModal');}
+}
 function confirmPreviousSpecialist(){const savedSpecialist=localStorage.getItem('last_specialist')||'Priority Match';document.querySelectorAll('.specialistHiddenField').forEach(el=>el.value=savedSpecialist);document.getElementById('interceptModal').style.display='none';safeOpenModal('verifyModal');}
 function skipIntercept(){document.querySelectorAll('.specialistHiddenField').forEach(el=>el.value='Priority Match');document.getElementById('interceptModal').style.display='none';safeOpenModal('verifyModal');}
 
