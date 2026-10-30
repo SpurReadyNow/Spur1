@@ -37,6 +37,7 @@
     <div class="cta-container">
         <div class="inline-pricing"><span id="displayPrice">$49.99 CAD</span> <span data-en="Priority Flat Rate" data-fr="Tarif Fixe Prioritaire">Priority Flat Rate</span><br><button type="button" onclick="safeOpenModal('codeModal')" style="background:none; border:none; color:var(--text-muted); font-size:10px; font-weight:700; text-decoration:underline; cursor:pointer; margin-top:8px;" data-en="HAVE SPURTAN CODE?" data-fr="AVEZ-UN CODE SPURTAN ?">HAVE SPURTAN CODE?</button></div>
         <div>
+            <!-- READY NOW ONLY -->
             <button class="ready-circle-btn" onclick="openIntercept('now')"><span class="ready-line-1">READY</span><span class="ready-line-2">NOW™</span></button>
             <div class="cta-footer-note" data-en="A SPUR Specialist assesses what you need.<br>You just show up." data-fr="Un spécialiste SPUR évalue ce dont vous avez besoin.<br>Vous vous présentez, tout simplement.">A SPUR Specialist assesses what you need.<br>You just show up.</div>
         </div>
@@ -122,9 +123,7 @@ function switchLanguage(lang){document.getElementById('btn-en').classList.toggle
 
 let currentInterceptType='now';
 function openIntercept(type){const lang=localStorage.getItem('spur_lang')||'en';
-// WAITLIST BLOCKER
 if(currentCity==='yul'||currentCity==='yyz'){alert(lang==='fr'?"Cette ville est actuellement sur liste d'attente. Veuillez rejoindre la liste d'accès Fondateur.":"This city is currently waitlisted. Please join the Founding Spurtan access list.");const nodeSelect=document.getElementById('spurtanNodeSelect');if(nodeSelect)nodeSelect.value=currentCity==='yul'?"Le Plateau, Montreal":"Financial District, Toronto";safeOpenModal('spurtanModal');return;}
-// BLOCK AFTER HOURS FOR "NOW" REQUESTS IN THIS SPECIFIC VARIANT
 if(type==='now'&&currentCity==='yvr'&&!isPTHours()){alert(lang==='fr'?"Le concierge est actuellement hors ligne. Veuillez revenir demain pour réserver votre place.":"The concierge is currently offline. Please check back tomorrow to secure a chair.");return;}
 try{currentInterceptType=type;const savedSpecialist=localStorage.getItem('last_specialist');const savedName=localStorage.getItem('spur_user_name');if(savedName&&savedSpecialist&&savedSpecialist!=='Priority Match'&&savedSpecialist!=='undefined'){document.getElementById('recognizedSpecialistText').textContent=lang==='fr'?`Demander ${savedSpecialist} à nouveau ?`:`Request ${savedSpecialist} again?`;document.getElementById('interceptModal').style.display='flex';}else{safeOpenModal('verifyModal');}}catch(err){safeOpenModal('verifyModal');}}
 function confirmPreviousSpecialist(){const savedSpecialist=localStorage.getItem('last_specialist')||'Priority Match';document.querySelectorAll('.specialistHiddenField').forEach(el=>el.value=savedSpecialist);document.getElementById('interceptModal').style.display='none';safeOpenModal('verifyModal');}
@@ -155,6 +154,7 @@ async function handleSubmit(event,type){
     let phone=localStorage.getItem('spur_user_phone');
     const nameInput=form.querySelector('input[name="client_name"]');
     const phoneInput=form.querySelector('input[name="client_phone"]');
+    const occasionSelect=form.querySelector('select[name="client_occasion"]');
     
     // EXTRACT DATE AND TIME FOR READY LATER (Preserved for scalable logic)
     const dateInput = form.querySelector('input[name="requested_date"]');
@@ -174,7 +174,7 @@ async function handleSubmit(event,type){
     
     const city=form.querySelector('.formCityField').value;
     const specialist=form.querySelector('input[name="requested_specialist"]')?.value||'Priority Match';
-    const occasion="Standard Refresh";
+    const occasion=occasionSelect&&occasionSelect.value?occasionSelect.value:'Standard Refresh';
     
     let finalPrice=49.99;
     let serviceRequested="SPUR Refresh";
